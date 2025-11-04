@@ -27,7 +27,7 @@ export class ChangeUserPlanUseCase {
 
     const activePlan = await this.historyRepo.findActivePlanByUserId(userId);
     
-    if (activePlan.planId === newPlan.id) {
+    if (activePlan?.planId === newPlan.id) {
       throw new HttpException('Ya tienes este plan activo. No es necesario volver a contratarlo.', 409);
     }
 

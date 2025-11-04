@@ -1,13 +1,13 @@
 import { Injectable } from "@nestjs/common";
 import { TokenTransaction, TokenTransactionType } from "../entities/token-transaction.entity";
-import { TokenTransactionRepository } from "../repositories/token-transaction.repository";
-import { UserRepository } from "../repositories/user.repository";
+import { UserMongoRepository } from "../../infrastructure/repositories/user-mongo.repository";
+import { TokenTransactionMongoRepository } from "../../infrastructure/repositories/token-transaction-mongo.repository";
 
 @Injectable()
 export class TokenService {
   constructor(
-    private readonly userRepo: UserRepository,
-    private readonly transactionRepo: TokenTransactionRepository,
+    private readonly userRepo: UserMongoRepository,
+    private readonly transactionRepo: TokenTransactionMongoRepository,
   ) {}
 
   async consume(userId: string, amount: number, description: string): Promise<void> {

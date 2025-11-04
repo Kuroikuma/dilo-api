@@ -27,7 +27,7 @@ export class ResetMonthlyTokensUseCase {
 
     const users = await this.userRepo.findByLastTokenReset(oneMonthAgo);
 
-    for (const user of users) {
+    for (const user of users || []) {
       // 🧠 1. Obtener el historial de plan más reciente
       const latestPlanHistory = await this.historyRepo.findLastByUserId(
         user.id,

@@ -33,11 +33,11 @@ export class ConfirmDeviceChangeUseCase {
       `;
     }
 
-    if (user.deviceChangeTokenExpiresAt < new Date()) {
+    if (user.deviceChangeTokenExpiresAt && user.deviceChangeTokenExpiresAt < new Date()) {
       // Limpiar el token expirado
-      user.deviceChangeToken = null;
-      user.deviceChangeTokenExpiresAt = null;
-      user.pendingNewDeviceId = null;
+      user.deviceChangeToken = undefined;
+      user.deviceChangeTokenExpiresAt = undefined;
+      user.pendingNewDeviceId = undefined;
       await this.userRepo.update(user);
       return `
         <!DOCTYPE html>
@@ -66,9 +66,9 @@ export class ConfirmDeviceChangeUseCase {
 
     // Confirmar el cambio de dispositivo
     user.deviceId = user.pendingNewDeviceId;
-    user.deviceChangeToken = null;
-    user.deviceChangeTokenExpiresAt = null;
-    user.pendingNewDeviceId = null;
+    user.deviceChangeToken = undefined;
+    user.deviceChangeTokenExpiresAt = undefined;
+    user.pendingNewDeviceId = undefined;
     await this.userRepo.update(user);
 
     return `

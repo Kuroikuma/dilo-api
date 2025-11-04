@@ -45,7 +45,7 @@ export class PaymentController {
   }
 
   @Post('payment')
-  async handlePayment(@Body() query: SubscribeWebhookDto, @Res() res: Response) {
+  async handlePayment(@Body() query: SubscribeWebhookDto, @Res() res: any) {
     console.log('body', query);
 
       await this.changePlanUseCase.execute('Pago exitoso', query.email, query.id_plan, query.orderNumber);

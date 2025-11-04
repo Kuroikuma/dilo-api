@@ -35,7 +35,7 @@ export class CancelUserPlanUseCase {
 
     await this.historyRepo.update(activePlan);
 
-    return { planId: plan.planId, email: user.email, cancelAt };
+    return { planId: plan?.planId || 0, email: user.email, cancelAt };
   }
 
   private monthsBetween(date1: Date, date2: Date): number {

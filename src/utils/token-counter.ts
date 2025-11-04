@@ -1,4 +1,3 @@
-import { encoding_for_model, TiktokenModel } from 'tiktoken';
 
 export enum TiktokenModelEnum {
   DAVINCI_002 = "davinci-002",
@@ -100,11 +99,4 @@ export enum TiktokenModelEnum {
   GPT_4_1_NANO_2025_04_14 = "gpt-4.1-nano-2025-04-14",
   GPT_4_5_PREVIEW = "gpt-4.5-preview",
   GPT_4_5_PREVIEW_2025_02_27 = "gpt-4.5-preview-2025-02-27",
-}
-
-
-export function countTokens(text: string, model: TiktokenModelEnum): number {
-  const enc = encoding_for_model(model);
-  const tokens = enc.encode(text);
-  return tokens.length;
 }

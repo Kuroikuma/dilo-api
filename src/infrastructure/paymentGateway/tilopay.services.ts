@@ -71,7 +71,7 @@ export class TilopayService {
       // Restamos un pequeño margen (e.g., 60 segundos) para evitar tokens a punto de expirar
       this.tokenExpiry = Date.now() + (expires_in * 1000) - (60 * 1000);
       this.logger.log('Token obtenido y cacheado exitosamente.');
-      return this.token;
+      return this.token || '';
     } catch (error) {
       this.logger.error(`Error al obtener el token externo: ${error.message}`, error.stack);
       // Puedes manejar diferentes tipos de errores aquí (e.g., 401, 403, network errors)

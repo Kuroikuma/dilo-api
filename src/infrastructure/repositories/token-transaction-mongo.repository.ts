@@ -83,7 +83,7 @@ export class TokenTransactionMongoRepository
     return docs.map(
       (doc) =>
         new TokenTransaction(
-          doc._id.toString(),
+          doc._id?.toString() || '',
           doc.userId.toString(),
           doc.amount,
           doc.type as TokenTransactionType,

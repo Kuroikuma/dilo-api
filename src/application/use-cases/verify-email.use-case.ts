@@ -8,7 +8,7 @@ export class VerifyEmailUseCase {
     if (!user) throw new Error('Token inválido');
 
     user.isEmailVerified = true;
-    user.emailVerificationToken = null;
+    user.emailVerificationToken = undefined;
     await this.userRepo.update(user);
   }
 }

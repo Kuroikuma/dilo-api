@@ -7,7 +7,7 @@ export class LogoutUseCase {
     const user = await this.userRepo.findById(userId);
     if (!user) throw new Error('Usuario no encontrado');
 
-    user.deviceId = null;
+    user.deviceId = undefined;
     await this.userRepo.update(user);
   }
 }

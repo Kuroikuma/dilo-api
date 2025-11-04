@@ -15,8 +15,8 @@ export class ResetPasswordUseCase {
     const hashed = await bcrypt.hash(newPassword, 10);
 
     user.password = hashed;
-    user.resetPasswordToken = null;
-    user.resetPasswordTokenExpiresAt = null;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordTokenExpiresAt = undefined;
 
     await this.userRepo.update(user);
   }

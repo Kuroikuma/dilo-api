@@ -16,11 +16,11 @@ export class UserPlanHistoryMongoRepository
 
   format = (doc: UserPlanHistoryDocument): UserPlanHistory => {
     return new UserPlanHistory(
-      doc._id.toString(),
+      doc._id?.toString() || '',
       doc.userId.toString(),
       doc.planId.toString(),
       doc.startDate,
-      doc.endDate,
+      doc.endDate || null,
       doc.changeReason,
       doc.tilopayTransactionId,
     );
@@ -30,7 +30,7 @@ export class UserPlanHistoryMongoRepository
     userId: string,
     session?: ClientSession,
   ): Promise<UserPlanHistory | null> {
-    const doc: UserPlanHistoryDocument = await this.model
+    const doc: UserPlanHistoryDocument | null = await this.model
       .findOne({ userId: new Types.ObjectId(userId) })
       .sort({ startDate: -1 })
       .session(session ?? null);
@@ -118,11 +118,11 @@ export class UserPlanHistoryMongoRepository
     return docs.map(
       (doc) =>
         new UserPlanHistory(
-          doc._id.toString(),
+          doc._id?.toString() || '',
           doc.userId.toString(),
           doc.planId.toString(),
           doc.startDate,
-          doc.endDate,
+          doc.endDate || null,
           doc.changeReason,
         ),
     );

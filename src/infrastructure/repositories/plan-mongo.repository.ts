@@ -17,7 +17,7 @@ export class PlanMongoRepository implements PlanRepository {
     const doc = await this.model.findOne({ planId });
     return doc
       ? new Plan(
-          doc._id.toString(),
+          doc._id?.toString() || '',
           doc.name,
           doc.tokensPerMonth,
           parseInt(doc.priceUsd.toString()),
@@ -32,7 +32,7 @@ export class PlanMongoRepository implements PlanRepository {
     const doc = await this.model.findById(id);
     return doc
       ? new Plan(
-          doc._id.toString(),
+          doc._id?.toString() || '',
           doc.name,
           doc.tokensPerMonth,
           parseInt(doc.priceUsd.toString()),
@@ -48,7 +48,7 @@ export class PlanMongoRepository implements PlanRepository {
     return docs.map(
       doc =>
         new Plan(
-          doc._id.toString(),
+          doc._id?.toString() || '',
           doc.name,
           doc.tokensPerMonth,
           parseInt(doc.priceUsd.toString()),

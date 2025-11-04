@@ -15,7 +15,7 @@ export class OpenAiSpeechService {
     });
   }
 
-  async transcribeAudio(file: Express.Multer.File): Promise<any> {
+  async transcribeAudio(file: any): Promise<any> {
        const stream = Readable.from(file.buffer);
 
     const transcription = await this.openai.audio.transcriptions.create({

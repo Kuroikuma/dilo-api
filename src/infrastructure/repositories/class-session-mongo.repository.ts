@@ -39,7 +39,7 @@ export class ClassSessionMongoRepository implements ClassSessionRepository {
     return docs.map(
       (doc) =>
         new ClassSession(
-          doc._id.toString(),
+          doc._id?.toString() || '',
           doc.userId.toString(),
           doc.title,
           doc.basePrompt,
@@ -80,7 +80,7 @@ export class ClassSessionMongoRepository implements ClassSessionRepository {
     const doc = await this.model.findById(id, {}, { session });
     return doc
       ? new ClassSession(
-          doc._id.toString(),
+          doc._id?.toString() || '',
           doc.userId.toString(),
           doc.title,
           doc.basePrompt,
@@ -89,6 +89,6 @@ export class ClassSessionMongoRepository implements ClassSessionRepository {
           doc.updatedAt,
           doc.level,
         )
-      : null;
+      : undefined as unknown as ClassSession;
   }
 }

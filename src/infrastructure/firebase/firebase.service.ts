@@ -9,7 +9,7 @@ export class FirebaseService {
 
   constructor(private configService: ConfigService) {
     const serviceAccount = JSON.parse(
-      this.configService.get<string>('FB_SERVICE_ACCOUNT')
+      this.configService.get<string>('FB_SERVICE_ACCOUNT') || ''
     );
 
     admin.initializeApp({

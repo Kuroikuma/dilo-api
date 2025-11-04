@@ -5,7 +5,7 @@ import { OpenAiSpeechService } from '../openai-speech.service';
 export class TranscribeAudioUseCase {
   constructor(private readonly speechService: OpenAiSpeechService) {}
 
-  async execute(file: Express.Multer.File) {
+  async execute(file: any) {
     return this.speechService.transcribeAudio(file);
   }
 }

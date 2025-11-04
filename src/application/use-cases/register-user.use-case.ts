@@ -44,7 +44,7 @@ export class RegisterUserUseCase {
       new UserPlanHistory(
         '',
         userSaved.id,
-        process.env.FREE_PLAN_ID,
+        process.env.FREE_PLAN_ID as string,
         now,
         null,
         reason,

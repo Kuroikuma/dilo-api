@@ -32,7 +32,7 @@ export class AssistantService {
       max_tokens: 15,
       temperature: 0.2, // Baja aleatoriedad
     });
-    return response.choices[0].message.content.trim();
+    return response.choices[0]?.message?.content?.trim() || '';
   }
 
   // Crear un nuevo thread en OpenAI y guardarlo en Mongo
@@ -103,14 +103,14 @@ export class AssistantService {
 
     // Crear run del assistant
     const run = await this.openai.beta.threads.runs.create(threadId, {
-      assistant_id: assistantId,
+      assistant_id: assistantId || '',
     });
 
     // Esperar a que el run se complete
-    let runStatus = await this.openai.beta.threads.runs.retrieve(threadId, run.id);
+    let runStatus = await this.openai.beta.threads.runs.retrieve(run.id, { thread_id: threadId });
     while (runStatus.status !== 'completed') {
       await new Promise((res) => setTimeout(res, 1000));
-      runStatus = await this.openai.beta.threads.runs.retrieve(threadId, run.id);
+      runStatus = await this.openai.beta.threads.runs.retrieve(run.id, { thread_id: threadId });
 
       if (runStatus.status === 'failed' || runStatus.status === 'cancelled') {
         throw new HttpException(`Run fallido: ${runStatus.status}`, 500);
@@ -118,7 +118,7 @@ export class AssistantService {
     }
 
     //cantidad de tokens usados
-    const tokensUsed = runStatus.usage.total_tokens;
+    const tokensUsed = runStatus?.usage?.total_tokens || 0;
 
     await this.consumeTokensUseCase.execute(threadMongo.userId, tokensUsed, threadMongo.title);
     // 🔥 Aquí está la diferencia: filtrar por run_id
@@ -163,7 +163,7 @@ export class AssistantService {
         response_format: 'url',
       });
 
-      const imageUrl = response.data[0].url;
+      const imageUrl = response.data?.[0]?.url || '';
       const imageName = `images/${threadId}/${Date.now()}.png`;
 
       // Subir a Firebase y obtener URL permanente

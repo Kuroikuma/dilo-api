@@ -17,12 +17,12 @@ export class OpenAiSpeechController {
 
   @Post('transcribe')
   @UseInterceptors(FileInterceptor('file'))
-  async transcribe(@UploadedFile() file: Express.Multer.File) {
+  async transcribe(@UploadedFile() file: any) {
     return this.transcribeAudio.execute(file);
   }
 
   @Post('synthesize')
-  async synthesize(@Body() dto: SynthesizeSpeechDto, @Res() res: Response) {
+  async synthesize(@Body() dto: SynthesizeSpeechDto, @Res() res: any) {
     const { stream, contentType } = await this.synthesizeSpeech.execute(dto);
 
     res.set({
