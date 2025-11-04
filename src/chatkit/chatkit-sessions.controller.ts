@@ -1,10 +1,12 @@
 // src/chatkit/chatkit-sessions.controller.ts
-import { Controller, Post, Body, Res, Req, Get, Query, Param, Delete, Logger } from '@nestjs/common';
+import { Controller, Post, Body, Res, Req, Get, Query, Param, Delete, Logger, UseGuards } from '@nestjs/common';
 import express, { request } from 'express';
 import { ChatKitSessionsService } from './chatkit-sessions.service';
 import { ConfigService } from '@nestjs/config';
 import { ThreadListResponseDto } from './dto/thread-list-response.dto';
 import { ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/presentation/guards/jwt-auth.guard';
+import { UserMongoRepository } from 'src/infrastructure/repositories/user-mongo.repository';
 
 interface CreateSessionRequestBody {
   workflow?: { id?: string | null } | null;
@@ -19,6 +21,7 @@ interface CreateSessionRequestBody {
 const SESSION_COOKIE_NAME = 'chatkit_session_id';
 const SESSION_COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 
+@UseGuards(JwtAuthGuard)
 @Controller('api/chatkit')
 export class ChatKitSessionsController {
   private readonly logger = new Logger(ChatKitSessionsController.name);
@@ -26,6 +29,7 @@ export class ChatKitSessionsController {
   constructor(
     private readonly chatKitSessionsService: ChatKitSessionsService,
     private configService: ConfigService,
+    private userRepo: UserMongoRepository,
   ) {}
 
   @Post('sessions')

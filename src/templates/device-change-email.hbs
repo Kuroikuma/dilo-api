@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Cambio de Dispositivo Detectado</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background-color: #4A90E2;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+        .content {
+            padding: 30px;
+            color: #333333;
+            line-height: 1.6;
+        }
+        .button-container {
+            text-align: center;
+            padding: 20px 0;
+        }
+        .button {
+            display: inline-block;
+            background-color: #5CB85C;
+            color: #ffffff;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        .button:hover {
+            background-color: #4CAF50;
+        }
+        .footer {
+            background-color: #f0f0f0;
+            color: #777777;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+        .link {
+            color: #4A90E2;
+            text-decoration: none;
+        }
+        .link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>¡Inicio de Sesión en un Nuevo Dispositivo Detectado!</h2>
+        </div>
+        <div class="content">
+            <p>Hola {{userName}},</p>
+            <p>Hemos detectado un intento de inicio de sesión en tu cuenta desde un nuevo dispositivo.</p>
+            <p><strong>Detalles del nuevo dispositivo:</strong></p>
+            <ul>
+                <li><strong>Dispositivo:</strong> {{deviceType}}</li>
+                <li><strong>Sistema Operativo:</strong> {{operatingSystem}}</li>
+                <li><strong>Navegador:</strong> {{browser}}</li>
+                <li><strong>Ubicación aproximada:</strong> {{location}}</li>
+                <li><strong>Dirección IP:</strong> {{ipAddress}}</li>
+                <li><strong>Fecha y Hora:</strong> {{loginDateTime}}</li>
+            </ul>
+            <p>Actualmente, tu sesión está activa en <strong>{{currentDevice}}</strong>.</p>
+            <p>Si fuiste tú quien intentó iniciar sesión desde este nuevo dispositivo, haz clic en el botón de abajo para confirmar y cambiar tu sesión a este nuevo dispositivo. Esto cerrará la sesión en tu dispositivo anterior.</p>
+            <div class="button-container">
+                <a href="{{confirmLink}}" class="button">Confirmar Cambio de Dispositivo</a>
+            </div>
+            <p>Si no reconoces esta actividad o no fuiste tú quien intentó iniciar sesión, por favor, ignora este correo electrónico. Por seguridad, te recomendamos cambiar tu contraseña inmediatamente si tienes alguna preocupación.</p>
+            <p>Para cambiar tu contraseña, visita: <a href="{{resetPasswordLink}}" class="link">{{resetPasswordLink}}</a></p>
+            <p>Gracias,</p>
+            <p>El equipo de tubachi</p>
+        </div>
+        <div class="footer">
+            <p>Este es un correo electrónico automático, por favor no respondas a este mensaje.</p>
+            <p>&copy; {{currentYear}} tubachi. Todos los derechos reservados.</p>
+        </div>
+    </div>
+</body>
+</html>

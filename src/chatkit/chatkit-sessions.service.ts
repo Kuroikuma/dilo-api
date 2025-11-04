@@ -1,14 +1,15 @@
 // src/chatkit/chatkit-sessions.service.ts
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { OpenAI } from 'openai';
+import { UserMongoRepository } from '../infrastructure/repositories/user-mongo.repository';
 
 @Injectable()
 export class ChatKitSessionsService {
   private readonly logger = new Logger(ChatKitSessionsService.name);
   private openai: OpenAI;
 
-  constructor(private configService: ConfigService) {
+  constructor(private configService: ConfigService, private userRepo: UserMongoRepository) {
     this.openai = new OpenAI({
       apiKey: this.configService.get<string>('OPENAI_API_KEY'),
     });
@@ -19,13 +20,25 @@ export class ChatKitSessionsService {
     chatkitConfiguration?: any;
   }) {
     try {
+      const user = await this.userRepo.findById(userId);
+
+      if (!user) throw new NotFoundException('Usuario no encontrado');
+
       const session = await this.openai.beta.chatkit.sessions.create({
         user: userId,
-        workflow: { id: workflowId },
+        workflow: { id: workflowId, state_variables: {
+          nombre: user.name,
+          correo: user.email,
+          motivacion: user.motivation,
+          inspiracion: user.inspiration,
+          nivel_grado: user.levelGrade,
+          perfil_resumen: user.profileSummary,
+        } },
         chatkit_configuration: {
           file_upload: options?.fileUpload || { enabled: false },
           ...options?.chatkitConfiguration,
         },
+        
       });
 
       this.logger.log(`Session created for user ${userId}: ${session.id}`);
