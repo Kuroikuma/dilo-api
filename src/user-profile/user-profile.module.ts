@@ -8,6 +8,7 @@ import { QuestionMongoRepository } from './infrastructure/mongo/repositories/que
 import { UserAnswerMongoRepository } from './infrastructure/mongo/repositories/user-answer-mongo.repository';
 import {
   CATEGORY_REPOSITORY,
+  QUESTION_CONDITION_SERVICE,
   QUESTION_REPOSITORY,
   UNIT_OF_WORK,
   USER_ANSWER_REPOSITORY,
@@ -16,6 +17,7 @@ import { GetUserProfileQuestionsUseCase } from './application/use-cases/get-user
 import { SaveUserAnswersUseCase } from './application/use-cases/save-user-answers.use-case';
 import { UserProfileController } from './user-profile.controller';
 import { MongoUnitOfWork } from './infrastructure/mongo/mongo-unit-of-work';
+import { QuestionConditionService } from './domain/services/question-condition.service';
 
 @Module({
   imports: [
@@ -42,6 +44,10 @@ import { MongoUnitOfWork } from './infrastructure/mongo/mongo-unit-of-work';
     {
       provide: USER_ANSWER_REPOSITORY,
       useClass: UserAnswerMongoRepository,
+    },
+    {
+      provide: QUESTION_CONDITION_SERVICE,
+      useClass: QuestionConditionService,
     },
     GetUserProfileQuestionsUseCase,
     SaveUserAnswersUseCase,

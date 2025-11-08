@@ -4,9 +4,11 @@ import type { QuestionRepository } from '../../domain/repositories/question.repo
 import type { UserAnswerRepository } from '../../domain/repositories/user-answer.repository';
 import {
   CATEGORY_REPOSITORY,
+  QUESTION_CONDITION_SERVICE,
   QUESTION_REPOSITORY,
   USER_ANSWER_REPOSITORY,
 } from '../../domain/repositories/repository.tokens';
+import type { QuestionConditionService } from '../../domain/services/question-condition.service';
 
 @Injectable()
 export class GetUserProfileQuestionsUseCase {
@@ -17,35 +19,50 @@ export class GetUserProfileQuestionsUseCase {
     private readonly questionRepo: QuestionRepository,
     @Inject(USER_ANSWER_REPOSITORY)
     private readonly userAnswerRepo: UserAnswerRepository,
+    @Inject(QUESTION_CONDITION_SERVICE)
+    private readonly conditionService: QuestionConditionService,
   ) {}
 
   async execute(userId: string) {
-    const [categories, questions, userAnswers] = await Promise.all([
+    const [categories, allQuestions, userAnswers] = await Promise.all([
       this.categoryRepo.findAllActive(),
       this.questionRepo.findAllActive(),
       this.userAnswerRepo.findByUserId(userId),
     ]);
 
+    // Filtrar preguntas relevantes basadas en condiciones
+    const relevantQuestions = this.conditionService.getRelevantQuestions(
+      allQuestions, 
+      userAnswers
+    );
+
     const answersMap = new Map(userAnswers.map(answer => [answer.questionId, answer]));
 
     const categoriesWithQuestions = categories.map(category => ({
       ...category,
-      questions: questions
+      questions: relevantQuestions
         .filter(q => q.categoryId === category.id)
         .map(question => ({
           ...question,
           userAnswer: answersMap.get(question.id) || null,
+          // Incluir información sobre si es condicional
+          isConditional: question.isConditional,
+          parentQuestionId: question.parentQuestionId,
         })),
     }));
 
     const profileComplete = await this.userAnswerRepo.getUserProfileComplete(userId);
+    const totalRelevant = relevantQuestions.length;
+    const percentage = totalRelevant > 0 
+      ? Math.round((profileComplete.answered / totalRelevant) * 100)
+      : 0;
 
     return {
       categories: categoriesWithQuestions,
       profileComplete: {
         answered: profileComplete.answered,
-        total: profileComplete.total,
-        percentage: Math.round((profileComplete.answered / profileComplete.total) * 100),
+        total: totalRelevant, // Usar solo preguntas relevantes para el total
+        percentage,
       },
     };
   }

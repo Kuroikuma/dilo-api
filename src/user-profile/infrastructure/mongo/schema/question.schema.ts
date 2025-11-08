@@ -11,10 +11,10 @@ export class QuestionDocument extends Document {
   @Prop({ type: Types.ObjectId, ref: 'CategoryDocument', required: true })
   categoryId: Types.ObjectId;
 
-  @Prop({ 
-    type: String, 
-    enum: ['text', 'number', 'select', 'multiselect', 'radio', 'boolean', 'email', 'date'], 
-    default: 'text'
+  @Prop({
+    type: String,
+    enum: ['text', 'number', 'select', 'multiselect', 'radio', 'boolean', 'email', 'date'],
+    default: 'text',
   })
   type: string;
 
@@ -41,6 +41,20 @@ export class QuestionDocument extends Document {
 
   @Prop({ default: () => new Date() })
   createdAt: Date;
+
+  // campos para preguntas condicionales
+  @Prop({ type: Types.ObjectId, ref: 'QuestionDocument', required: false })
+  parentQuestionId: Types.ObjectId;
+
+  @Prop({ type: Object })
+  condition: {
+    parentQuestionId: Types.ObjectId;
+    operator: string;
+    expectedValue: any;
+  };
+
+  @Prop({ default: false })
+  isConditional: boolean;
 }
 
 export const QuestionSchema = SchemaFactory.createForClass(QuestionDocument);

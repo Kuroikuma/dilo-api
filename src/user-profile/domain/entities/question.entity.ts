@@ -10,6 +10,21 @@ export enum QuestionType {
   DATE = 'date',
 }
 
+export enum Operator {
+  EQUALS = 'equals',
+  CONTAINS = 'contains',
+  GREATER_THAN = 'greater_than',
+  LESS_THAN = 'less_than',
+  IN = 'in',
+  NOT_EMPTY = 'not_empty',
+}
+
+export interface Condition {
+  parentQuestionId: string;
+  operator: Operator;
+  expectedValue: any;
+}
+
 export class Question {
   constructor(
     public readonly id: string,
@@ -24,5 +39,10 @@ export class Question {
     public validationRules?: Record<string, any>,
     public isActive: boolean = true,
     public createdAt: Date = new Date(),
+
+     // campos para preguntas condicionales
+     public parentQuestionId?: string,
+     public condition?: Condition,
+     public isConditional: boolean = false,
   ) {}
 }

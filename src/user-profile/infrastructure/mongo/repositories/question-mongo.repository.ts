@@ -49,6 +49,13 @@ export class QuestionMongoRepository implements QuestionRepository {
       q.validationRules,
       q.isActive,
       q.createdAt,
+      q.parentQuestionId?.toString(),
+      q.condition ? {
+        parentQuestionId: q.condition.parentQuestionId.toString(),
+        operator: q.condition.operator as any,
+        expectedValue: q.condition.expectedValue,
+      } : undefined,
+      q.isConditional,
     );
   }
 
@@ -99,5 +106,27 @@ export class QuestionMongoRepository implements QuestionRepository {
       await doc.save({ session });
       return this.formatQuestionDocument(doc);
     }
+  }
+
+  async findChildren(parentQuestionId: string, transaction?: ITransaction): Promise<Question[]> {
+    const session = this.getSession(transaction);
+    const docs = await this.model
+      .find({ parentQuestionId, isActive: true })
+      .sort({ order: 1 })
+      .session(session || null)
+      .exec();
+    
+    return docs.map(doc => this.formatQuestionDocument(doc));
+  }
+
+  async findRootQuestions(transaction?: ITransaction): Promise<Question[]> {
+    const session = this.getSession(transaction);
+    const docs = await this.model
+      .find({ parentQuestionId: { $exists: false }, isActive: true })
+      .sort({ order: 1 })
+      .session(session || null)
+      .exec();
+    
+    return docs.map(doc => this.formatQuestionDocument(doc));
   }
 }
