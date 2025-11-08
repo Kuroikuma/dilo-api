@@ -56,6 +56,7 @@ import { CancelUserPlanUseCase } from './application/use-cases/cancel-user-plan.
 import { ResetMonthlyTokensUseCase } from './application/use-cases/reset-monthly-tokens';
 import { OpenAiSpeechModule } from './openai-speech/openai-speech.module';
 import { ChatKitModule } from './chatkit/chatkit.module';
+import { UserProfileModule } from './user-profile/user-profile.module';
 
 @Module({
   imports: [
@@ -102,6 +103,7 @@ import { ChatKitModule } from './chatkit/chatkit.module';
     }),
     OpenAiSpeechModule,
     ChatKitModule,
+    UserProfileModule,
   ],
   controllers: [AppController, AuthController, PlanController, PaymentController, ClassSessionController],
   providers: [
