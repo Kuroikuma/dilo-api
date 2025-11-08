@@ -9,11 +9,13 @@ import { UserAnswerMongoRepository } from './infrastructure/mongo/repositories/u
 import {
   CATEGORY_REPOSITORY,
   QUESTION_REPOSITORY,
+  UNIT_OF_WORK,
   USER_ANSWER_REPOSITORY,
 } from './domain/repositories/repository.tokens';
 import { GetUserProfileQuestionsUseCase } from './application/use-cases/get-user-profile-questions.use-case';
 import { SaveUserAnswersUseCase } from './application/use-cases/save-user-answers.use-case';
 import { UserProfileController } from './user-profile.controller';
+import { MongoUnitOfWork } from './infrastructure/mongo/mongo-unit-of-work';
 
 @Module({
   imports: [
@@ -25,6 +27,10 @@ import { UserProfileController } from './user-profile.controller';
   ],
   controllers: [UserProfileController],
   providers: [
+    {
+      provide: UNIT_OF_WORK,
+      useClass: MongoUnitOfWork,
+    },
     {
       provide: CATEGORY_REPOSITORY,
       useClass: CategoryMongoRepository,

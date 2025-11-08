@@ -4,41 +4,80 @@ import { ClientSession, Model } from 'mongoose';
 import { CategoryRepository } from '../../../domain/repositories/category.repository';
 import { Category } from '../../../domain/entities/category.entity';
 import { CategoryDocument } from '../schema/category.schema';
+import { ITransaction } from '../../../domain/repositories/transaction.interface';
+import { MongoTransaction } from '../mongo-unit-of-work';
 
 @Injectable()
 export class CategoryMongoRepository implements CategoryRepository {
   constructor(
-    @InjectModel(CategoryDocument.name) private readonly model: Model<CategoryDocument>,
+    @InjectModel(CategoryDocument.name)
+    private readonly model: Model<CategoryDocument>,
   ) {}
 
+  private getSession(transaction?: ITransaction) {
+    return transaction && transaction instanceof MongoTransaction ? transaction.getSession() : undefined;
+  }
+
   private formatCategoryDocument(cat: CategoryDocument): Category {
-    return new Category(
-      cat._id?.toString() || '',
-      cat.name,
-      cat.description,
-      cat.order,
-      cat.isActive,
-      cat.createdAt,
-    );
+    return new Category(cat._id?.toString() || '', cat.name, cat.description, cat.order, cat.isActive, cat.createdAt);
   }
 
-  async findAllActive(session?: ClientSession): Promise<Category[]> {
-    const docs = await this.model.find({ isActive: true }).sort({ order: 1 }).session(session ?? null).exec();
-    return docs.map(doc => this.formatCategoryDocument(doc));
+  async findAll(transaction?: ITransaction): Promise<Category[]> {
+    const session = this.getSession(transaction);
+    const docs = await this.model
+      .find()
+      .session(session || null)
+      .exec();
+
+    return docs.map((doc) => this.formatCategoryDocument(doc)) as Category[];
   }
 
-  async findById(id: string, session?: ClientSession): Promise<Category | null> {
-    const doc = await this.model.findById(id).session(session ?? null).exec();
+  async delete(id: string, transaction?: ITransaction): Promise<void> {
+    const session = this.getSession(transaction);
+    await this.model
+      .findByIdAndDelete(id)
+      .session(session || null)
+      .exec();
+  }
+
+  async findAllActive(transaction?: ITransaction): Promise<Category[]> {
+    const session = this.getSession(transaction);
+    const docs = await this.model
+      .find({ isActive: true })
+      .sort({ order: 1 })
+      .session(session || null)
+      .exec();
+
+    return docs.map((doc) => this.formatCategoryDocument(doc)) as Category[];
+  }
+
+  async findById(id: string, transaction?: ITransaction): Promise<Category | null> {
+    const session = this.getSession(transaction);
+    const doc = await this.model
+      .findById(id)
+      .session(session || null)
+      .exec();
+
     return doc ? this.formatCategoryDocument(doc) : null;
   }
 
-  async create(category: Partial<Category>, session?: ClientSession): Promise<Category> {
-    const doc = new this.model(category);
-    await doc.save({ session });
-    return this.formatCategoryDocument(doc);
-  }
+  async save(entity: Category, transaction?: ITransaction): Promise<Category> {
+    const session = this.getSession(transaction);
 
-  async update(category: Category, session?: ClientSession): Promise<void> {
-    await this.model.findByIdAndUpdate(category.id, category, { session });
+    if (entity.id) {
+      // Update
+      const doc = await this.model
+        .findByIdAndUpdate(entity.id, entity, { new: true })
+        .session(session || null)
+        .exec();
+
+      if (!doc) throw new Error('Category not found');
+      return this.formatCategoryDocument(doc);
+    } else {
+      // Create
+      const doc = new this.model(entity);
+      await doc.save({ session });
+      return this.formatCategoryDocument(doc);
+    }
   }
 }

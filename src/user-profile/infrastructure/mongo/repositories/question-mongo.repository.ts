@@ -4,12 +4,36 @@ import { ClientSession, Model } from 'mongoose';
 import { QuestionRepository } from '../../../domain/repositories/question.repository';
 import { Question } from '../../../domain/entities/question.entity';
 import { QuestionDocument } from '../schema/question.schema';
+import { ITransaction } from 'src/user-profile/domain/repositories/transaction.interface';
+import { MongoTransaction } from '../mongo-unit-of-work';
 
 @Injectable()
 export class QuestionMongoRepository implements QuestionRepository {
   constructor(
-    @InjectModel(QuestionDocument.name) private readonly model: Model<QuestionDocument>,
+    @InjectModel(QuestionDocument.name)
+    private readonly model: Model<QuestionDocument>,
   ) {}
+
+  async findAll(transaction?: ITransaction): Promise<Question[]> {
+    const session = this.getSession(transaction);
+    const docs = await this.model
+      .find()
+      .session(session ?? null)
+      .exec();
+    return docs.map((doc) => this.formatQuestionDocument(doc)) as Question[];
+  }
+  
+  async delete(id: string, transaction?: ITransaction): Promise<void> {
+    const session = this.getSession(transaction);
+    await this.model
+      .findByIdAndDelete(id)
+      .session(session ?? null)
+      .exec();
+  }
+
+  private getSession(transaction?: ITransaction) {
+    return transaction && transaction instanceof MongoTransaction ? transaction.getSession() : undefined;
+  }
 
   private formatQuestionDocument(q: QuestionDocument): Question {
     return new Question(
@@ -28,28 +52,52 @@ export class QuestionMongoRepository implements QuestionRepository {
     );
   }
 
-  async findAllActive(session?: ClientSession): Promise<Question[]> {
-    const docs = await this.model.find({ isActive: true }).sort({ order: 1 }).session(session ?? null).exec();
-    return docs.map(doc => this.formatQuestionDocument(doc));
+  async findAllActive(transaction?: ITransaction): Promise<Question[]> {
+    const session = this.getSession(transaction);
+    const docs = await this.model
+      .find({ isActive: true })
+      .sort({ order: 1 })
+      .session(session ?? null)
+      .exec();
+    return docs.map((doc) => this.formatQuestionDocument(doc));
   }
 
-  async findByCategory(categoryId: string, session?: ClientSession): Promise<Question[]> {
-    const docs = await this.model.find({ categoryId, isActive: true }).sort({ order: 1 }).session(session ?? null).exec();
-    return docs.map(doc => this.formatQuestionDocument(doc));
+  async findByCategory(categoryId: string, transaction?: ITransaction): Promise<Question[]> {
+    const session = this.getSession(transaction);
+    const docs = await this.model
+      .find({ categoryId, isActive: true })
+      .sort({ order: 1 })
+      .session(session ?? null)
+      .exec();
+    return docs.map((doc) => this.formatQuestionDocument(doc));
   }
 
-  async findById(id: string, session?: ClientSession): Promise<Question | null> {
-    const doc = await this.model.findById(id).session(session ?? null).exec();
+  async findById(id: string, transaction?: ITransaction): Promise<Question | null> {
+    const session = this.getSession(transaction);
+    const doc = await this.model
+      .findById(id)
+      .session(session ?? null)
+      .exec();
     return doc ? this.formatQuestionDocument(doc) : null;
   }
 
-  async create(question: Partial<Question>, session?: ClientSession): Promise<Question> {
-    const doc = new this.model(question);
-    await doc.save({ session });
-    return this.formatQuestionDocument(doc);
-  }
+  async save(entity: Question, transaction?: ITransaction): Promise<Question> {
+    const session = this.getSession(transaction);
 
-  async update(question: Question, session?: ClientSession): Promise<void> {
-    await this.model.findByIdAndUpdate(question.id, question, { session });
+    if (entity.id) {
+      // Update
+      const doc = await this.model
+        .findByIdAndUpdate(entity.id, entity, { new: true })
+        .session(session ?? null)
+        .exec();
+
+      if (!doc) throw new Error('Question not found');
+      return this.formatQuestionDocument(doc);
+    } else {
+      // Create
+      const doc = new this.model(entity);
+      await doc.save({ session });
+      return this.formatQuestionDocument(doc);
+    }
   }
 }
