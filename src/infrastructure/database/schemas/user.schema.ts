@@ -26,16 +26,6 @@ export class UserDocument extends Document {
 
   @Prop({ default: false })
   isEmailVerified: boolean;
-  @Prop()
-  motivation: string;
-
-  @Prop()
-  inspiration: string;
-
-  @Prop()
-  levelGrade: string;
-  @Prop()
-  profileSummary: string;
 
   @Prop()
   emailVerificationToken?: string;

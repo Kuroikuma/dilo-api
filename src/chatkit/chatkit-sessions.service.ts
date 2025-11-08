@@ -28,11 +28,6 @@ export class ChatKitSessionsService {
         user: userId,
         workflow: { id: workflowId, state_variables: {
           nombre: user.name,
-          correo: user.email,
-          motivacion: user.motivation,
-          inspiracion: user.inspiration,
-          nivel_grado: user.levelGrade,
-          perfil_resumen: user.profileSummary,
         } },
         chatkit_configuration: {
           file_upload: options?.fileUpload || { enabled: false },

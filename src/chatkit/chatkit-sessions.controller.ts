@@ -7,16 +7,7 @@ import { ThreadListResponseDto } from './dto/thread-list-response.dto';
 import { ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/presentation/guards/jwt-auth.guard';
 import { UserMongoRepository } from 'src/infrastructure/repositories/user-mongo.repository';
-
-interface CreateSessionRequestBody {
-  workflow?: { id?: string | null } | null;
-  workflowId?: string | null;
-  chatkit_configuration?: {
-    file_upload?: {
-      enabled?: boolean;
-    };
-  };
-}
+import { CreateSessionRequestBodyDto } from './dto/create-session-request-body.dto';
 
 const SESSION_COOKIE_NAME = 'chatkit_session_id';
 const SESSION_COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
@@ -34,7 +25,7 @@ export class ChatKitSessionsController {
 
   @Post('sessions')
   async createSession(
-    @Body() body: CreateSessionRequestBody,
+    @Body() body: CreateSessionRequestBodyDto,
     @Req() request: express.Request,
     @Res() response: express.Response,
   ) {
