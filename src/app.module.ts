@@ -61,8 +61,7 @@ import { ChatKitModule } from './chatkit/chatkit.module';
   imports: [
     HttpModule,
     ConfigModule.forRoot({
-      isGlobal: true, // para que esté disponible en todos los módulos
-      ignoreEnvFile: true,
+      isGlobal: true,
     }),
     MongooseModule.forRoot(process.env.MONGODB_URI as string),
     MongooseModule.forFeature([
