@@ -9,9 +9,27 @@ import {
   USER_ANSWER_REPOSITORY,
 } from '../../domain/repositories/repository.tokens';
 import type { QuestionConditionService } from '../../domain/services/question-condition.service';
+import { Category } from '../../domain/entities/category.entity';
+import { Question } from '../../domain/entities/question.entity';
+
+interface ICategoryWithQuestions extends Category {
+  questions: Question[];
+}
+
+interface IGetUserProfileQuestionsResponse {
+  categories: ICategoryWithQuestions[];
+  profileComplete: {
+    answered: number;
+    total: number;
+    percentage: number;
+  };
+}
+interface IGetUserProfileQuestionsUseCase {
+  execute(userId: string): Promise<IGetUserProfileQuestionsResponse>;
+}
 
 @Injectable()
-export class GetUserProfileQuestionsUseCase {
+export class GetUserProfileQuestionsUseCase implements IGetUserProfileQuestionsUseCase {
   constructor(
     @Inject(CATEGORY_REPOSITORY)
     private readonly categoryRepo: ICategoryRepository,
