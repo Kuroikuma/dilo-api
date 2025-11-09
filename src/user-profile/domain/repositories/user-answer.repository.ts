@@ -2,7 +2,7 @@ import { UserAnswer } from '../entities/user-answer.entity';
 import { ITransaction } from './transaction.interface';
 import { IRepository } from './repository.interface';
 
-export interface UserAnswerRepository extends IRepository<UserAnswer> {
+export interface IUserAnswerRepository extends IRepository<UserAnswer> {
   findByUserId(userId: string, transaction?: ITransaction): Promise<UserAnswer[]>;
   findByUserAndQuestion(userId: string, questionId: string, transaction?: ITransaction): Promise<UserAnswer | null>;
   save(answer: UserAnswer, transaction?: ITransaction): Promise<UserAnswer>;

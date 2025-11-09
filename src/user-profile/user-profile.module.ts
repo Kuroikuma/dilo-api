@@ -18,6 +18,8 @@ import { SaveUserAnswersUseCase } from './application/use-cases/save-user-answer
 import { UserProfileController } from './user-profile.controller';
 import { MongoUnitOfWork } from './infrastructure/mongo/mongo-unit-of-work';
 import { QuestionConditionService } from './domain/services/question-condition.service';
+import { CreateCategoryWithQuestionsUseCase } from './application/use-cases/create-category-with-questions.use-case';
+import { AddQuestionsToCategoryUseCase } from './application/use-cases/add-questions-to-category.use-case';
 
 @Module({
   imports: [
@@ -51,11 +53,19 @@ import { QuestionConditionService } from './domain/services/question-condition.s
     },
     GetUserProfileQuestionsUseCase,
     SaveUserAnswersUseCase,
+    CreateCategoryWithQuestionsUseCase,
+    AddQuestionsToCategoryUseCase,
   ],
   exports: [
     CATEGORY_REPOSITORY,
     QUESTION_REPOSITORY,
+    UNIT_OF_WORK,
     USER_ANSWER_REPOSITORY,
+    QUESTION_CONDITION_SERVICE,
+    GetUserProfileQuestionsUseCase,
+    SaveUserAnswersUseCase,
+    CreateCategoryWithQuestionsUseCase,
+    AddQuestionsToCategoryUseCase,
   ],
 })
 export class UserProfileModule {}

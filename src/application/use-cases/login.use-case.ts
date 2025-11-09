@@ -77,7 +77,21 @@ export class LoginUseCase {
     user.deviceId = incomingDeviceId; // Actualiza o establece el deviceId
     await this.userRepo.update(user);
 
-    const token = this.jwtService.sign({ ...user, expiresPlan: history?.endDate || null });
+    // Crear payload sin información sensible
+    const payload = {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      surname: user.surname,
+      tokenBalance: user.tokenBalance,
+      planId: user.planId,
+      lastTokenReset: user.lastTokenReset,
+      isEmailVerified: user.isEmailVerified,
+      deviceId: user.deviceId,
+      expiresPlan: history?.endDate || null,
+    };
+
+    const token = this.jwtService.sign(payload);
     return { token };
   }
 }

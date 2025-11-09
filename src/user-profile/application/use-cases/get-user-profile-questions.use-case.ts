@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
-import type { CategoryRepository } from '../../domain/repositories/category.repository';
-import type { QuestionRepository } from '../../domain/repositories/question.repository';
-import type { UserAnswerRepository } from '../../domain/repositories/user-answer.repository';
+import type { ICategoryRepository } from '../../domain/repositories/category.repository';
+import type { IQuestionRepository } from '../../domain/repositories/question.repository';
+import type { IUserAnswerRepository } from '../../domain/repositories/user-answer.repository';
 import {
   CATEGORY_REPOSITORY,
   QUESTION_CONDITION_SERVICE,
@@ -14,11 +14,11 @@ import type { QuestionConditionService } from '../../domain/services/question-co
 export class GetUserProfileQuestionsUseCase {
   constructor(
     @Inject(CATEGORY_REPOSITORY)
-    private readonly categoryRepo: CategoryRepository,
+    private readonly categoryRepo: ICategoryRepository,
     @Inject(QUESTION_REPOSITORY)
-    private readonly questionRepo: QuestionRepository,
+    private readonly questionRepo: IQuestionRepository,
     @Inject(USER_ANSWER_REPOSITORY)
-    private readonly userAnswerRepo: UserAnswerRepository,
+    private readonly userAnswerRepo: IUserAnswerRepository,
     @Inject(QUESTION_CONDITION_SERVICE)
     private readonly conditionService: QuestionConditionService,
   ) {}

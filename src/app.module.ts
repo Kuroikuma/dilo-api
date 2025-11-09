@@ -3,6 +3,7 @@ import { AppService } from './app.service';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule, JwtService } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
 import { UserSchema, UserDocument } from './infrastructure/database/schemas/user.schema';
 import { AuthController } from './presentation/auth.controller';
 import { UserMongoRepository } from './infrastructure/repositories/user-mongo.repository';
@@ -28,7 +29,7 @@ import { ListPlansUseCase } from './application/use-cases/list-plans.use-case';
 import { ChangeUserPlanUseCase } from './application/use-cases/change-user-plan.use-case';
 import { GetUserPlanHistoryUseCase } from './application/use-cases/get-user-plan-history.use-case';
 import { PlanController } from './presentation/plan.controller';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RegisterUserUseCase } from './application/use-cases/register-user.use-case';
 import { VerifyEmailUseCase } from './application/use-cases/verify-email.use-case';
 import { MongoTransactionService } from './infrastructure/mongo/mongo-transaction.service';
@@ -72,9 +73,16 @@ import { UserProfileModule } from './user-profile/user-profile.module';
       { name: UserPlanHistoryDocument.name, schema: UserPlanHistorySchema },
       { name: ClassSessionDocument.name, schema: ClassSessionSchema },
     ]),
-    JwtModule.register({
-      secret: process.env.JWT_SECRET, // usa env variable en real
-      signOptions: { expiresIn: process.env.JWT_EXPIRES_IN ? parseInt(process.env.JWT_EXPIRES_IN) : 3600 },
+    PassportModule.register({ defaultStrategy: 'jwt' }),
+    JwtModule.registerAsync({
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET') || process.env.JWT_SECRET,
+        signOptions: {
+          expiresIn: '3d',
+        },
+      }),
+      inject: [ConfigService],
+      imports: [ConfigModule],
     }),
     MailerModule.forRoot({
       transport: {

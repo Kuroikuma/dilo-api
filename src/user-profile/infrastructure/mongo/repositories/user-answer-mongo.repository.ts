@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ClientSession, Model } from 'mongoose';
-import { UserAnswerRepository } from '../../../domain/repositories/user-answer.repository';
+import { IUserAnswerRepository } from '../../../domain/repositories/user-answer.repository';
 import { UserAnswer } from '../../../domain/entities/user-answer.entity';
 import { UserAnswerDocument } from '../schema/answer.schema';
 import { ITransaction } from 'src/user-profile/domain/repositories/transaction.interface';
 import { MongoTransaction } from '../mongo-unit-of-work';
 
 @Injectable()
-export class UserAnswerMongoRepository implements UserAnswerRepository {
+export class UserAnswerMongoRepository implements IUserAnswerRepository {
   constructor(
     @InjectModel(UserAnswerDocument.name)
     private readonly model: Model<UserAnswerDocument>,

@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ClientSession, Model } from 'mongoose';
-import { CategoryRepository } from '../../../domain/repositories/category.repository';
+import { ICategoryRepository } from '../../../domain/repositories/category.repository';
 import { Category } from '../../../domain/entities/category.entity';
 import { CategoryDocument } from '../schema/category.schema';
 import { ITransaction } from '../../../domain/repositories/transaction.interface';
 import { MongoTransaction } from '../mongo-unit-of-work';
 
 @Injectable()
-export class CategoryMongoRepository implements CategoryRepository {
+export class CategoryMongoRepository implements ICategoryRepository {
   constructor(
     @InjectModel(CategoryDocument.name)
     private readonly model: Model<CategoryDocument>,

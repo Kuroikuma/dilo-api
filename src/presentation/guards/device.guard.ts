@@ -7,6 +7,9 @@ export class DeviceGuard implements CanActivate {
   constructor(private readonly userRepo: UserMongoRepository) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+
+    console.log('DeviceGuard');
+    
     const request = context.switchToHttp().getRequest();
     const deviceId = request.headers['x-device-id'];
     const user = request.user;

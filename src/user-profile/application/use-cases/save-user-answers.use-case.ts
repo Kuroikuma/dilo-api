@@ -1,6 +1,6 @@
 import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
-import type { UserAnswerRepository } from '../../domain/repositories/user-answer.repository';
-import type { QuestionRepository } from '../../domain/repositories/question.repository';
+import type { IUserAnswerRepository } from '../../domain/repositories/user-answer.repository';
+import type { IQuestionRepository } from '../../domain/repositories/question.repository';
 import { UserAnswer } from '../../domain/entities/user-answer.entity';
 import {
   QUESTION_REPOSITORY,
@@ -18,9 +18,9 @@ interface AnswerDto {
 export class SaveUserAnswersUseCase {
   constructor(
     @Inject(USER_ANSWER_REPOSITORY)
-    private readonly userAnswerRepo: UserAnswerRepository,
+    private readonly userAnswerRepo: IUserAnswerRepository,
     @Inject(QUESTION_REPOSITORY)
-    private readonly questionRepo: QuestionRepository,
+    private readonly questionRepo: IQuestionRepository,
     @Inject(UNIT_OF_WORK)
     private readonly unitOfWork: IUnitOfWork,
   ) {}
