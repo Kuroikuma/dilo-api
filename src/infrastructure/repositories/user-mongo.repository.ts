@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { ClientSession, Model } from 'mongoose';
+import mongoose, { ClientSession, Model } from 'mongoose';
 import { UserRepository } from '../../domain/repositories/user.repository';
 import { User } from '../../domain/entities/user.entity';
 import { UserDocument } from '../database/schemas/user.schema';
@@ -49,7 +49,8 @@ export class UserMongoRepository implements UserRepository {
   }
 
   async findById(id: string, session?: ClientSession): Promise<User | null> {
-    const doc = await this.model.findById(id, {}, { session });
+    const userId = new mongoose.Types.ObjectId(id);
+    const doc = await this.model.findById(userId, {}, { session });
     const docUser = doc ? this.formatUserDocument(doc) : null;
     return docUser;
   }

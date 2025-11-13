@@ -3,6 +3,7 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { OpenAI } from 'openai';
 import { UserMongoRepository } from '../infrastructure/repositories/user-mongo.repository';
+import mongoose, { ClientSession, Model, Types } from 'mongoose';
 
 @Injectable()
 export class ChatKitSessionsService {

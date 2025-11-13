@@ -30,7 +30,7 @@ export class ChatKitSessionsController {
     @Res() response: express.Response,
   ) {
     try {
-      const { userId, sessionCookie } = await this.resolveUserId(request);
+      const {  sessionCookie } = await this.resolveUserId(request);
       
       const workflowId = body.workflow?.id || body.workflowId || this.configService.get('CHATKIT_WORKFLOW_ID');
       
@@ -39,6 +39,7 @@ export class ChatKitSessionsController {
           error: 'Missing workflow id',
         });
       }
+      const userId = (request?.user as any)?.id;
 
       const session = await this.chatKitSessionsService.createSession(userId, workflowId, {
         fileUpload: {
