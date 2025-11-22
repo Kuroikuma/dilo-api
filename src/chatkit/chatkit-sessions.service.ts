@@ -4,41 +4,65 @@ import { ConfigService } from '@nestjs/config';
 import { OpenAI } from 'openai';
 import { UserMongoRepository } from '../infrastructure/repositories/user-mongo.repository';
 import mongoose, { ClientSession, Model, Types } from 'mongoose';
+import { UserProfileSummaryMongoRepository } from 'src/user-profile/infrastructure/mongo/repositories/user-profile-summary-mongo.repository';
+import { json } from 'stream/consumers';
 
 @Injectable()
 export class ChatKitSessionsService {
   private readonly logger = new Logger(ChatKitSessionsService.name);
   private openai: OpenAI;
 
-  constructor(private configService: ConfigService, private userRepo: UserMongoRepository) {
+  constructor(
+    private configService: ConfigService,
+    private userRepo: UserMongoRepository,
+    private userProfileSummaryRepo: UserProfileSummaryMongoRepository,
+  ) {
     this.openai = new OpenAI({
       apiKey: this.configService.get<string>('OPENAI_API_KEY'),
     });
   }
 
-  async createSession(userId: string, workflowId: string, options?: {
-    fileUpload?: { enabled: boolean };
-    chatkitConfiguration?: any;
-  }) {
+  async createSession(
+    userId: string,
+    workflowId: string,
+    options?: {
+      fileUpload?: { enabled: boolean };
+      chatkitConfiguration?: any;
+    },
+  ) {
     try {
       const user = await this.userRepo.findById(userId);
+      const userProfileSummary = await this.userProfileSummaryRepo.findByUserId(userId);
 
       if (!user) throw new NotFoundException('Usuario no encontrado');
+      if (!userProfileSummary) throw new NotFoundException('Perfil no encontrado');
+
+      const learningProfile = {
+        ...userProfileSummary.learningProfile,
+        challenges: userProfileSummary.learningProfile.challenges.join(', '),
+        goals: userProfileSummary.learningProfile.goals.join(', '),
+        interests: userProfileSummary.learningProfile.interests.join(', '),
+        motivation: userProfileSummary.learningProfile.motivation.join(', '),
+        preferredTopics: userProfileSummary.learningProfile.preferredTopics.join(', '),
+      };
 
       const session = await this.openai.beta.chatkit.sessions.create({
         user: userId,
-        workflow: { id: workflowId, state_variables: {
-          nombre: user.name,
-        } },
+        workflow: {
+          id: workflowId,
+          state_variables: {
+            profileText: userProfileSummary.profileText,
+            learningProfile: JSON.stringify(learningProfile),
+          },
+        },
         chatkit_configuration: {
           file_upload: options?.fileUpload || { enabled: false },
           ...options?.chatkitConfiguration,
         },
-        
       });
 
       this.logger.log(`Session created for user ${userId}: ${session.id}`);
-      
+
       return {
         client_secret: session.client_secret,
         expires_after: null,
@@ -53,11 +77,14 @@ export class ChatKitSessionsService {
   /**
    * Listar threads por usuario
    */
-  async listThreadsByUser(userId: string, options?: {
-    limit?: number;
-    before?: string;
-    order?: 'asc' | 'desc';
-  }) {
+  async listThreadsByUser(
+    userId: string,
+    options?: {
+      limit?: number;
+      before?: string;
+      order?: 'asc' | 'desc';
+    },
+  ) {
     try {
       const threads = await this.openai.beta.chatkit.threads.list({
         user: userId,
@@ -67,7 +94,7 @@ export class ChatKitSessionsService {
       });
 
       this.logger.log(`Retrieved ${threads.data.length} threads for user ${userId}`);
-      
+
       return {
         data: threads.data,
         has_more: threads.has_more,
@@ -95,11 +122,14 @@ export class ChatKitSessionsService {
   /**
    * Listar items de un thread (mensajes, tareas, etc.)
    */
-  async listThreadItems(threadId: string, options?: {
-    limit?: number;
-    before?: string;
-    order?: 'asc' | 'desc';
-  }) {
+  async listThreadItems(
+    threadId: string,
+    options?: {
+      limit?: number;
+      before?: string;
+      order?: 'asc' | 'desc';
+    },
+  ) {
     try {
       const items = await this.openai.beta.chatkit.threads.listItems(threadId, {
         limit: options?.limit || 50,
@@ -108,7 +138,7 @@ export class ChatKitSessionsService {
       });
 
       this.logger.log(`Retrieved ${items.data.length} items for thread ${threadId}`);
-      
+
       return {
         data: items.data,
         has_more: items.has_more,

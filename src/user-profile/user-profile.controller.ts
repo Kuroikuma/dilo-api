@@ -7,6 +7,7 @@ import { CreateCategoryWithQuestionsUseCase } from './application/use-cases/crea
 import { AddQuestionsToCategoryUseCase } from './application/use-cases/add-questions-to-category.use-case';
 import { CreateQuestionDto } from './application/dtos/create-question.dto';
 import { CreateCategoryWithQuestionsDto } from './application/dtos/create-category-with-questions.dto';
+import { GenerateUserProfileUseCase } from './application/use-cases/generate-user-profile.use-case';
 
 @Controller('user-profile')
 export class UserProfileController {
@@ -15,6 +16,7 @@ export class UserProfileController {
     private readonly saveUserAnswersUseCase: SaveUserAnswersUseCase,
     private readonly createCategoryWithQuestionsUseCase: CreateCategoryWithQuestionsUseCase,
     private readonly addQuestionsToCategoryUseCase: AddQuestionsToCategoryUseCase,
+    private readonly generateUserProfileUseCase: GenerateUserProfileUseCase,
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -26,7 +28,8 @@ export class UserProfileController {
   @UseGuards(JwtAuthGuard)
   @Post('answers')
   async saveAnswers(@Request() req, @Body() body: SaveAnswersDto) {
-    return this.saveUserAnswersUseCase.execute(req.user.id, body.answers);
+    await  this.saveUserAnswersUseCase.execute(req.user.id, body.answers);
+    return this.generateUserProfileUseCase.execute(req.user.id);
   }
 
   @Post('categories-with-questions')
