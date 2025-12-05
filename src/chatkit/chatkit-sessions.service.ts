@@ -38,12 +38,15 @@ export class ChatKitSessionsService {
       if (!userProfileSummary) throw new NotFoundException('Perfil no encontrado');
 
       const learningProfile = {
-        ...userProfileSummary.learningProfile,
         challenges: userProfileSummary.learningProfile.challenges.join(', '),
         goals: userProfileSummary.learningProfile.goals.join(', '),
         interests: userProfileSummary.learningProfile.interests.join(', '),
         motivation: userProfileSummary.learningProfile.motivation.join(', '),
         preferredTopics: userProfileSummary.learningProfile.preferredTopics.join(', '),
+        level: userProfileSummary.learningProfile.level,
+        learningStyle: userProfileSummary.learningProfile.learningStyle,
+        conversationStyle: userProfileSummary.learningProfile.conversationStyle,
+        personalContext: userProfileSummary.learningProfile.personalContext,
       };
 
       const session = await this.openai.beta.chatkit.sessions.create({
@@ -52,7 +55,17 @@ export class ChatKitSessionsService {
           id: workflowId,
           state_variables: {
             profileText: userProfileSummary.profileText,
-            learningProfile: JSON.stringify(learningProfile),
+            challenges: userProfileSummary.learningProfile.challenges.join(', '),
+            goals: userProfileSummary.learningProfile.goals.join(', '),
+            interests: userProfileSummary.learningProfile.interests.join(', '),
+            motivation: userProfileSummary.learningProfile.motivation.join(', '),
+            preferredTopics: userProfileSummary.learningProfile.preferredTopics.join(', '),
+            level: userProfileSummary.learningProfile.level,
+            learningStyle: userProfileSummary.learningProfile.learningStyle,
+            conversationStyle: userProfileSummary.learningProfile.conversationStyle,
+            personalContext: userProfileSummary.learningProfile.personalContext,
+            name: user.name,
+            surname: user.surname,
           },
         },
         chatkit_configuration: {
